@@ -39,7 +39,7 @@ gulp.task('mobile', ['wpt_uat01'], function () {
             "usability_score": data.ruleGroups.USABILITY.score
         };
 
-        var content = JSON.parse(fs.readFileSync('output/wpt-results-uat01-'+timestamp+'.json',"utf-8").toString());
+        var content = JSON.parse(fs.readFileSync('output/psi-results-uat01-'+timestamp+'.json',"utf-8").toString());
 
         var performance = {
             "wpt": content,
@@ -117,11 +117,12 @@ gulp.task('mobile_prod', ['wpt_prod'], function () {
         strategy: 'mobile',
     }).then(function (data) {
         var result = {
+            "type": "mobile",
             "speed_score": data.ruleGroups.SPEED.score,
             "usability_score": data.ruleGroups.USABILITY.score
         };
         
-        var content = JSON.parse(fs.readFileSync('output/wpt-results-uat01-'+timestamp+'.json',"utf-8").toString());
+        var content = JSON.parse(fs.readFileSync('output/psi-results-prod-'+timestamp+'.json',"utf-8").toString());
 
         var performance = {
             "wpt": content,
@@ -133,24 +134,31 @@ gulp.task('mobile_prod', ['wpt_prod'], function () {
 
         performance.psi.mobile = result;
 
-        fs.writeFile('output/murad-perf-results-uat01-'+timestamp+'.json',JSON.stringify(performance),function(data){});        
+        fs.writeFile('output/psi-results-prod-'+timestamp+'.json',JSON.stringify(performance),function(data){});        
         
         // console.log('Speed score: ' + data.ruleGroups.SPEED.score);
         // console.log('Usability score: ' + data.ruleGroups.USABILITY.score);
     });
 });
 
-gulp.task('desktop_prod', function () {
+gulp.task('desktop_prod', ['mobile_prod'], function () {
     return psi('https://www.murad.com', {
         nokey: 'true',
         // key: key,
         strategy: 'desktop',
     }).then(function (data) {
+    
         var result = {
+            "type": "desktop",
             "speed_score": data.ruleGroups.SPEED.score
-
+            
         };
-        fs.writeFile('output/murad-perf-results-prod-'+timestamp+'.json',JSON.stringify(result),function(data){});
+        
+        var content = JSON.parse(fs.readFileSync('output/psi-results-prod-'+timestamp+'.json',"utf-8").toString());
+
+        content.psi.desktop = result;        
+    
+        fs.writeFile('output/psi-results-prod-'+timestamp+'.json',JSON.stringify(content),function(data){});
         
         // console.log('Speed score: ' + data.ruleGroups.SPEED.score);
         
@@ -162,7 +170,7 @@ gulp.task('wpt_prod', webpagetest({
     key: 'A.8da8f989626192b7d45d16725bac6c68',
     location: 'Dulles:Chrome',
     firstViewOnly: true,
-    output: 'output/wpt-results-prod-'+timestamp+'.json',
+    output: 'output/psi-results-prod-'+timestamp+'.json',
     budget: {
       SpeedIndex: 1000,
       visualComplete: 1000
@@ -175,6 +183,6 @@ gulp.task('wpt_prod', webpagetest({
 
 gulp.task('default', ['desktop']);
 // gulp.task('default', ['mobile', 'desktop', 'wpt_uat01']);
-gulp.task('prod', ['mobile_prod', 'desktop_prod', 'wpt_prod']);
+gulp.task('prod', [ 'desktop_prod']);
 
 
