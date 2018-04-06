@@ -122,7 +122,7 @@ gulp.task('mobile_prod', ['wpt_prod'], function () {
             "usability_score": data.ruleGroups.USABILITY.score
         };
         
-        var content = JSON.parse(fs.readFileSync('output/psi-results-prod-'+timestamp+'.json',"utf-8").toString());
+        var content = JSON.parse(fs.readFileSync('output/wpt-results-prod-'+timestamp+'.json',"utf-8").toString());
 
         var performance = {
             "wpt": content,
@@ -170,7 +170,7 @@ gulp.task('wpt_prod', webpagetest({
     key: 'A.8da8f989626192b7d45d16725bac6c68',
     location: 'Dulles:Chrome',
     firstViewOnly: true,
-    output: 'output/psi-results-prod-'+timestamp+'.json',
+    output: 'output/wpt-results-prod-'+timestamp+'.json',
     budget: {
       SpeedIndex: 1000,
       visualComplete: 1000
